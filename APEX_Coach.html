@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>APEX — Lookmaxing Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:#080c14;color:#e8edf5;min-height:100vh;overflow-x:hidden}
+:root{
+  --bg:#080c14;--card:#0f1624;--card2:#141d2e;--border:#1e2d45;
+  --text:#e8edf5;--muted:#4a6080;
+  --accent:#3b82f6;--green:#10b981;--red:#ef4444;--amber:#f59e0b;--purple:#8b5cf6;
+}
+.light{
+  --bg:#f0f4f8;--card:#ffffff;--card2:#f8fafc;--border:#e2e8f0;
+  --text:#1a202c;--muted:#718096;
+}
+body{background:var(--bg);color:var(--text)}
+.app{max-width:430px;margin:0 auto;min-height:100vh;position:relative}
+.screen{padding:0 0 90px;min-height:calc(100vh - 80px);overflow-y:auto}
+.header{padding:52px 20px 16px}
+h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;line-height:1.2}
+h2{font-size:20px;font-weight:700}
+h3{font-size:15px;font-weight:600}
+.label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.muted{font-size:13px;color:var(--muted)}
+/* Cards */
+.card{background:var(--card);border-radius:20px;padding:18px 20px;margin-bottom:12px;border:1px solid var(--border)}
+.card2{background:var(--card2);border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border)}
+/* Buttons */
+.btn{background:var(--accent);color:#fff;border:none;border-radius:14px;padding:14px 20px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-0.2px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit}
+.btn:active{opacity:.85;transform:scale(.98)}
+.btn-full{width:100%}
+.btn-green{background:var(--green)}
+.btn-amber{background:var(--amber)}
+.btn-purple{background:var(--purple)}
+.btn-outline{background:transparent;color:var(--accent);border:1.5px solid var(--accent);border-radius:14px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
+/* Layout */
+.row{display:flex;align-items:center;gap:10px}
+.between{display:flex;align-items:center;justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* Progress bar */
+.bar-outer{background:var(--border);border-radius:999px;overflow:hidden}
+.bar-inner{border-radius:999px;transition:width .5s ease;height:100%}
+/* Badge */
+.badge{border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700}
+/* Input */
+.inp{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:12px 16px;font-size:14px;color:var(--text);width:100%;outline:none;font-family:inherit}
+textarea.inp{resize:none}
+select.inp{appearance:none;cursor:pointer}
+/* Checkbox */
+.check{width:26px;height:26px;border-radius:8px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0}
+.check.done{background:var(--green);border-color:var(--green)}
+/* Navbar */
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(8,12,20,.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;z-index:100}
+.light nav{background:rgba(255,255,255,.95)}
+.nav-btn{flex:1;padding:10px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;background:none;border:none;color:var(--muted);font-size:8px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;font-family:inherit;transition:color .2s}
+.nav-btn.active{color:var(--accent)}
+.nav-btn svg{margin-bottom:1px}
+/* Toggle */
+.toggle{width:50px;height:28px;border-radius:14px;background:var(--border);cursor:pointer;position:relative;transition:background .2s;border:none;flex-shrink:0}
+.toggle.on{background:var(--accent)}
+.toggle-dot{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:left .2s}
+.toggle.on .toggle-dot{left:25px}
+/* Timer badge */
+.timer-big{font-size:48px;font-weight:900;color:var(--accent);text-align:center}
+/* Chat bubbles */
+.bubble-ai{background:var(--card);border:1px solid var(--border);border-radius:18px 18px 18px 4px;padding:12px 16px;max-width:82%}
+.bubble-user{background:var(--accent);border-radius:18px 18px 4px 18px;padding:12px 16px;max-width:82%}
+/* Typing dots */
+@keyframes dot{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;opacity:.7}
+.dot:nth-child(1){animation:dot 1s .0s infinite}
+.dot:nth-child(2){animation:dot 1s .15s infinite}
+.dot:nth-child(3){animation:dot 1s .3s infinite}
+/* Week chart */
+.bar-week{display:flex;align-items:flex-end;gap:6px;height:100px;padding-bottom:8px}
+.bar-week-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-week-fill{width:100%;border-radius:6px 6px 0 0;min-height:4px;transition:height .5s ease}
+/* Scrollbar */
+::-webkit-scrollbar{width:0}
+/* API Key modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--card);border-radius:24px;padding:28px;width:100%;max-width:380px;border:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <!-- screens rendered by JS -->
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════
+const MODEL = "claude-sonnet-4-20250514";
+
+const SYS_COACH = `Tu es APEX, un coach personnel d'élite spécialisé en transformation physique, discipline mentale et nutrition. Tu parles en français.
+Ton style : direct, motivant, sérieux mais encourageant. Pas de blabla inutile. Comme un coach sportif de haut niveau.
+Tu analyses les données de l'utilisateur et tu donnes des conseils personnalisés courts (max 3 phrases).
+Exemples : "Lève-toi, aujourd'hui tu progresses." / "Bon choix, continue comme ça." / "Tu veux changer ton physique ? Alors reste constant."`;
+
+const SYS_FOOD = `Tu es un nutritionniste expert. L'utilisateur décrit un repas.
+Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans aucun texte avant ou après :
+{"verdict":"OK","score":7,"explication":"Bon apport protéique mais manque de légumes.","alternative":"Ajoute une salade verte ou des légumes vapeur."}
+Le verdict est "OK" si score >= 6, sinon "EVITER".`;
+
+// ══════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════
+const MORNING = [
+  {id:"wake",icon:"☀️",label:"Réveil à l'heure"},
+  {id:"water_am",icon:"💧",label:"Grand verre d'eau"},
+  {id:"shower_am",icon:"🚿",label:"Douche froide"},
+  {id:"skincare",icon:"🧴",label:"Skincare"},
+  {id:"teeth",icon:"🦷",label:"Brossage dents"},
+  {id:"outfit",icon:"👕",label:"Tenue propre / soignée"},
+  {id:"posture",icon:"🧘",label:"Posture 2 min"},
+];
+const EVENING = [
+  {id:"shower_pm",icon:"🚿",label:"Douche soir"},
+  {id:"skincare_pm",icon:"🧴",label:"Skincare soir"},
+  {id:"prep",icon:"📋",label:"Préparer demain"},
+  {id:"noscreen",icon:"📵",label:"Pas d'écran 30 min"},
+  {id:"sleep",icon:"😴",label:"Couché avant 23h"},
+];
+const WORKOUT_A = [
+  {id:"pushups",icon:"💪",label:"Pompes",sets:"4×15",rest:60},
+  {id:"squats",icon:"🦵",label:"Squats",sets:"4×20",rest:60},
+  {id:"plank",icon:"🏋️",label:"Gainage",sets:"3×45s",rest:45},
+  {id:"abs",icon:"🔥",label:"Abdos",sets:"3×20",rest:60},
+];
+const WORKOUT_B = [
+  {id:"run",icon:"🏃",label:"Course / Marche rapide",sets:"30 min",rest:0},
+  {id:"burpees",icon:"⚡",label:"Burpees",sets:"3×10",rest:90},
+  {id:"lunges",icon:"🦵",label:"Fentes alternées",sets:"3×12",rest:60},
+  {id:"stretch",icon:"🧘",label:"Étirements",sets:"10 min",rest:0},
+];
+const LEVELS = [
+  {name:"Novice",min:0,color:"#64748b"},
+  {name:"Débutant",min:100,color:"#3b82f6"},
+  {name:"Intermédiaire",min:300,color:"#8b5cf6"},
+  {name:"Avancé",min:600,color:"#f59e0b"},
+  {name:"Élite",min:1000,color:"#ef4444"},
+  {name:"APEX",min:2000,color:"#10b981"},
+];
+const COACH_TIPS = [
+  "Lève-toi, aujourd'hui tu progresses.",
+  "Tu veux changer ton physique ? Alors reste constant.",
+  "Bon choix, continue comme ça.",
+  "La discipline bat la motivation. Tous les jours.",
+  "Chaque verre d'eau, chaque série, ça compte.",
+  "Ton futur toi te remerciera. Reste focus.",
+  "Pas d'excuse. Juste de l'action.",
+];
+
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+const S = {
+  tab: "home",
+  dark: true,
+  xp: 150,
+  streak: 7,
+  water: 3,
+  morning: {},
+  evening: {},
+  workoutDay: "A",
+  exercises: {},
+  foodDesc: "",
+  foodResult: null,
+  foodLoading: false,
+  cameraAsked: false,
+  cameraAllowed: false,
+  showCameraModal: false,
+  photoPreview: null,
+  coachMsgs: [{role:"ai",text:"Salut champion. Je suis APEX, ton coach IA. Prêt à transformer ton physique en 30 jours ? Dis-moi comment tu te sens aujourd'hui."}],
+  chatInput: "",
+  chatLoading: false,
+  coachTip: COACH_TIPS[Math.floor(Math.random()*COACH_TIPS.length)],
+  timerSec: 0,
+  timerRunning: false,
+  timerLabel: "",
+  apiKey: localStorage.getItem("apex_key") || "",
+  showKeyModal: false,
+  settings: {wakeTime:"07:00",goal:"Prise de masse",difficulty:"Intermédiaire",notifs:true},
+  weekData: [65,80,45,90,70,100,0],
+};
+
+// ══════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════
+function getLevel(xp){
+  let lv = LEVELS[0];
+  for(const l of LEVELS) if(xp>=l.min) lv=l;
+  return lv;
+}
+function nextLevel(xp){
+  for(let i=LEVELS.length-1;i>=0;i--){
+    if(xp>=LEVELS[i].min) return LEVELS[i+1]||LEVELS[LEVELS.length-1];
+  }
+  return LEVELS[1];
+}
+function pct(n,d){return d?Math.round((n/d)*100):0}
+function morningPct(){return pct(Object.values(S.morning).filter(Boolean).length, MORNING.length)}
+function eveningPct(){return pct(Object.values(S.evening).filter(Boolean).length, EVENING.length)}
+function routinePct(){return Math.round((morningPct()+eveningPct())/2)}
+function waterPct(){return Math.min(100,pct(S.water,8))}
+function workoutExs(){return S.workoutDay==="A"?WORKOUT_A:WORKOUT_B}
+function workoutPct(){return pct(Object.values(S.exercises).filter(Boolean).length, workoutExs().length)}
+function xpPct(){
+  const lv=getLevel(S.xp), nx=nextLevel(S.xp);
+  return Math.min(100,Math.round(((S.xp-lv.min)/(nx.min-lv.min))*100));
+}
+
+async function callAI(messages, system){
+  if(!S.apiKey) { S.showKeyModal=true; render(); return ""; }
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":S.apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:MODEL,max_tokens:600,system,messages})
+    });
+    const data = await res.json();
+    if(data.error) return "⚠️ " + data.error.message;
+    return data.content?.[0]?.text || "";
+  } catch(e) {
+    return "Connexion IA indisponible. Reste focus !";
+  }
+}
+
+// Timer
+let timerInterval = null;
+function startTimer(sec, label){
+  clearInterval(timerInterval);
+  S.timerSec = sec; S.timerRunning = true; S.timerLabel = label;
+  render();
+  timerInterval = setInterval(()=>{
+    S.timerSec--;
+    if(S.timerSec<=0){clearInterval(timerInterval);S.timerRunning=false;S.timerLabel="";}
+    render();
+  },1000);
+}
+
+// ══════════════════════════════════════════════════
+// SVG ICONS
+// ══════════════════════════════════════════════════
+const ICONS = {
+  home:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  list:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
+  camera:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
+  dumbbell:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="3" height="3" rx="1"/><rect x="2" y="16" width="3" height="3" rx="1"/><rect x="19" y="5" width="3" height="3" rx="1"/><rect x="19" y="16" width="3" height="3" rx="1"/><line x1="5" y1="6.5" x2="19" y2="6.5"/><line x1="5" y1="17.5" x2="19" y2="17.5"/><line x1="12" y1="6.5" x2="12" y2="17.5"/></svg>`,
+  droplet:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>`,
+  bar:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
+  bot:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>`,
+  settings:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`,
+  send:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+  check:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  zap:`<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  flame:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 01-7 7 7 7 0 01-7-7c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>`,
+  star:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+  plus:`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  key:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>`,
+};
+
+function ic(name,size=22,color="currentColor"){
+  return ICONS[name]?ICONS[name].replace('width="22" height="22"',`width="${size}" height="${size}"`).replace(/stroke="currentColor"/g,`stroke="${color}"`):'';
+}
+
+// ══════════════════════════════════════════════════
+// PROGRESS BAR HELPER
+// ══════════════════════════════════════════════════
+function progressBar(p,color,h=8){
+  return `<div class="bar-outer" style="height:${h}px"><div class="bar-inner" style="background:${color};width:${p}%;height:${h}px"></div></div>`;
+}
+function badge(text,color){
+  return `<span class="badge" style="background:${color}22;color:${color}">${text}</span>`;
+}
+
+// ══════════════════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════════════════
+function screenHome(){
+  const lv=getLevel(S.xp), nx=nextLevel(S.xp), xpp=xpPct();
+  const date=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+  return `
+<div class="screen">
+  <div class="header">
+    <div class="between">
+      <div>
+        <p class="label" style="margin-bottom:6px">${date}</p>
+        <h1>Bonjour, <span style="color:var(--accent)">Champion</span> 👊</h1>
+      </div>
+      <div style="text-align:center;background:var(--card2);border-radius:14px;padding:10px 14px;border:1px solid var(--border)">
+        <div style="font-size:28px;font-weight:900;color:var(--amber);line-height:1">${S.streak}</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.1em">STREAK 🔥</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:0 16px">
+    <!-- XP Card -->
+    <div class="card" style="background:linear-gradient(135deg,${lv.color}18,var(--card))">
+      <div class="between">
+        <div>
+          <p class="label">Niveau</p>
+          <div class="row" style="margin-top:4px">
+            <span style="font-size:22px;font-weight:900;color:${lv.color}">${lv.name}</span>
+            ${badge(S.xp+" XP",lv.color)}
+          </div>
+        </div>
+        <div style="color:${lv.color}">${ic('zap',36,lv.color)}</div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="between"><span class="muted">Vers ${nx.name}</span><span style="font-size:12px;color:${lv.color};font-weight:700">${xpp}%</span></div>
+        <div style="margin-top:6px">${progressBar(xpp,lv.color,8)}</div>
+      </div>
+    </div>
+
+    <!-- Coach tip -->
+    <div class="card" style="background:linear-gradient(135deg,var(--accent)18,var(--card));border-color:var(--accent)40">
+      <div class="row" style="margin-bottom:10px">
+        <div style="background:var(--accent)20;border-radius:10px;padding:8px">${ic('bot',18,'var(--accent)')}</div>
+        <div><p class="label" style="color:var(--accent)">APEX Coach</p><p class="muted" style="font-size:12px">Message du jour</p></div>
+      </div>
+      <p style="margin:0;font-size:15px;line-height:1.6;font-style:italic">"${S.coachTip}"</p>
+    </div>
+
+    <!-- Progress grid -->
+    <div class="grid2" style="margin-bottom:12px">
+      ${[
+        {label:"Routine",p:routinePct(),icon:"list",color:"var(--purple)",tab:"routine"},
+        {label:"Sport",p:workoutPct(),icon:"dumbbell",color:"var(--green)",tab:"sport"},
+        {label:"Hydratation",p:waterPct(),icon:"droplet",color:"var(--accent)",tab:"water"},
+        {label:"Nutrition",p:S.foodResult?100:0,icon:"camera",color:"var(--amber)",tab:"food"},
+      ].map(({label,p,icon,color,tab})=>`
+        <div class="card2" style="cursor:pointer" onclick="go('${tab}')">
+          <div class="row" style="margin-bottom:8px">
+            <div style="background:${color.replace('var(','').replace(')','').startsWith('#')?color+'20':color+'20'};border-radius:8px;padding:6px">${ic(icon,14,color)}</div>
+            <span style="font-size:12px;font-weight:600;color:var(--muted)">${label}</span>
+          </div>
+          <div style="font-size:22px;font-weight:900;color:${p>=100?'var(--green)':'var(--text)'};margin-bottom:6px">${p}%</div>
+          ${progressBar(p,color,4)}
+        </div>`).join('')}
+    </div>
+
+    <!-- Quick actions -->
+    <div class="grid2">
+      <button class="btn btn-full" onclick="go('routine')">${ic('list',16,'#fff')} Routine</button>
+      <button class="btn btn-full btn-green" onclick="go('sport')">${ic('dumbbell',16,'#fff')} Sport</button>
+      <button class="btn btn-full btn-amber" onclick="go('food')">${ic('camera',16,'#fff')} Scanner</button>
+      <button class="btn btn-full btn-purple" onclick="go('coach')">${ic('bot',16,'#fff')} Coach IA</button>
+    </div>
+  </div>
+</div>`;
+}
+
+function screenRoutine(){
+  const mp=morningPct(), ep=eveningPct();
+  function taskRow(t, checked, fn){
+    return `<div class="between" style="padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="${fn}('${t.id}')">
+      <div class="row">
+        <span style="font-size:20px">${t.icon}</span>
+        <span style="font-size:15px;font-weight:${checked?700:400};color:${checked?'var(--green)':'var(--text)'};text-decoration:${checked?'line-through':'none'};opacity:${checked?.7:1}">${t.label}</span>
+      </div>
+      <div class="check ${checked?'done':''}">${checked?ic('check'):''}</div>
+    </div>`;
+  }
+  return `
+<div class="screen">
+  <div class="header">
+    <p class="label">Aujourd'hui</p>
+    <h1>Routine <span style="color:var(--purple)">Quotidienne</span></h1>
+    <div class="row" style="margin-top:8px">${badge(routinePct()+'% complété','var(--purple)')}<span class="muted" style="font-size:12px">+10 XP par tâche</span></div>
+  </div>
+  <div style="padding:0 16px">
+    <div class="card" style="margin-bottom:16px">
+      <div class="between" style="margin-bottom:12px">
+        <div class="row"><span style="font-size:20px">🌅</span><h3>Routine Matin</h3></div>
+        ${badge(mp+'%','var(--amber)')}
+      </div>
+      ${MORNING.map(t=>taskRow(t,!!S.morning[t.id],'toggleMorning')).join('')}
+    </div>
+    <div class="card">
+      <div class="between" style="margin-bottom:12px">
+        <div class="row"><span style="font-size:20px">🌙</span><h3>Routine Soir</h3></div>
+        ${badge(ep+'%','var(--purple)')}
+      </div>
+      ${EVENING.map(t=>taskRow(t,!!S.evening[t.id],'toggleEvening')).join('')}
+    </div>
+  </div>
+</div>`;
+}
+
+function screenFood(){
+  // First visit → show camera permission modal
+  if(!S.cameraAsked){
+    return `
+<div class="screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;padding:32px">
+  <div style="text-align:center;max-width:320px">
+    <div style="font-size:72px;margin-bottom:20px">📸</div>
+    <h2 style="margin-bottom:12px">Scanner alimentaire</h2>
+    <p class="muted" style="font-size:15px;line-height:1.6;margin-bottom:32px">APEX peut utiliser la caméra de ton téléphone pour analyser ton repas en photo. Souhaites-tu activer la caméra ?</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <button class="btn btn-full btn-amber" style="font-size:17px;padding:18px;border-radius:18px" onclick="allowCamera()">
+        📷 Oui, activer la caméra
+      </button>
+      <button class="btn btn-full" style="background:var(--card2);color:var(--text);border:1.5px solid var(--border);font-size:15px;padding:16px;border-radius:18px" onclick="denyCamera()">
+        ✏️ Non, je préfère écrire
+      </button>
+    </div>
+    <p class="muted" style="font-size:11px;margin-top:16px">Tu pourras changer ce choix dans les paramètres</p>
+  </div>
+</div>`;
+  }
+
+  let resultHtml='';
+  if(S.foodLoading){
+    resultHtml=`<div class="card" style="text-align:center;padding:32px"><div style="font-size:36px;margin-bottom:12px">🔍</div><p style="color:var(--muted)">Analyse IA en cours...</p></div>`;
+  } else if(S.foodResult){
+    const r=S.foodResult, ok=r.verdict==="OK", c=ok?'var(--green)':'var(--red)';
+    resultHtml=`
+<div class="card" style="border:2px solid ${c}50">
+  <div style="text-align:center;margin-bottom:16px">
+    <div style="font-size:56px;line-height:1">${ok?'✅':'❌'}</div>
+    <div style="font-size:28px;font-weight:900;color:${c};margin-top:8px">${ok?'Bon choix !':'À éviter'}</div>
+  </div>
+  <div class="between" style="margin-bottom:12px">
+    <span style="font-weight:700">Score santé</span>
+    <div class="row">
+      ${[...Array(10)].map((_,i)=>`<div style="width:16px;height:16px;border-radius:4px;background:${i<r.score?(r.score>=7?'var(--green)':r.score>=5?'var(--amber)':'var(--red)'):'var(--border)'};margin-left:2px"></div>`).join('')}
+      <span style="margin-left:8px;font-weight:900;font-size:18px">${r.score}/10</span>
+    </div>
+  </div>
+  <div class="card2" style="margin-bottom:10px">
+    <p class="label" style="margin-bottom:4px">Analyse</p>
+    <p style="margin:0;font-size:14px;line-height:1.6">${r.explication}</p>
+  </div>
+  ${r.alternative?`<div class="card2" style="border:1px solid var(--green)40"><p class="label" style="color:var(--green);margin-bottom:4px">✨ Alternative proposée</p><p style="margin:0;font-size:14px;line-height:1.6">${r.alternative}</p></div>`:''}
+</div>`;
+  }
+
+  const photoPreviewHtml = S.photoPreview ? `
+<div style="margin-bottom:12px;border-radius:16px;overflow:hidden;position:relative">
+  <img src="${S.photoPreview}" style="width:100%;border-radius:16px;display:block;max-height:220px;object-fit:cover"/>
+  <button onclick="S.photoPreview=null;render()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+</div>` : '';
+
+  return `
+<div class="screen">
+  <div class="header">
+    <p class="label">Nutrition</p>
+    <h1>Scanner <span style="color:var(--amber)">Alimentaire</span></h1>
+    <p class="muted" style="margin-top:6px">Photo ou description → analyse IA instantanée</p>
+  </div>
+  <div style="padding:0 16px">
+    <div class="card" style="border:1px solid var(--amber)40">
+
+      ${S.cameraAllowed ? `
+      <!-- Camera button -->
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <button class="btn btn-amber btn-full" onclick="openCamera()" style="flex:1">
+          📷 Prendre une photo
+        </button>
+        <button onclick="S.cameraAllowed=false;S.cameraAsked=false;render()" style="background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--muted);font-size:12px;white-space:nowrap">
+          ✕ Caméra
+        </button>
+      </div>
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)"/>
+      ${photoPreviewHtml}
+      <p class="muted" style="font-size:12px;text-align:center;margin-bottom:10px">— ou décris ton repas —</p>
+      ` : `
+      <div style="background:var(--amber)15;border-radius:16px;padding:20px;text-align:center;margin-bottom:16px">
+        <div style="font-size:48px;margin-bottom:8px">📸</div>
+        <p style="color:var(--amber);font-weight:700;font-size:14px;margin-bottom:4px">Scanner alimentaire IA</p>
+        <button class="btn-outline" style="margin-top:8px;font-size:12px" onclick="S.cameraAsked=false;render()">Activer la caméra</button>
+      </div>
+      `}
+
+      <textarea id="foodInp" class="inp" style="min-height:72px;margin-bottom:12px" placeholder="Ex: Pizza pepperoni + coca-cola… ou Salade caesar avec poulet grillé">${S.foodDesc}</textarea>
+      <button class="btn btn-amber btn-full" onclick="scanFood()" ${S.foodLoading?'disabled':''}>
+        ${S.foodLoading?'⏳ Analyse en cours...':'🔍 Analyser'}
+      </button>
+    </div>
+    ${resultHtml}
+    <div class="card">
+      <p class="label" style="margin-bottom:12px">Conseils nutritionnels</p>
+      <div class="card2" style="margin-bottom:8px">
+        <div class="row"><span style="font-size:18px">✅</span><div><p class="label" style="margin-bottom:2px">Favoriser</p><p class="muted" style="font-size:13px">Protéines · Légumes · Fruits · Féculents complets</p></div></div>
+      </div>
+      <div class="card2">
+        <div class="row"><span style="font-size:18px">❌</span><div><p class="label" style="margin-bottom:2px">Éviter</p><p class="muted" style="font-size:13px">Soda · Fast-food · Sucre industriel · Ultra-transformé</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+function screenSport(){
+  const exs=workoutExs(), wp=workoutPct();
+  return `
+<div class="screen">
+  <div class="header">
+    <p class="label">Training</p>
+    <h1>Sport <span style="color:var(--green)">du jour</span></h1>
+  </div>
+  <div style="padding:0 16px">
+    <div class="card" style="display:flex;gap:10px">
+      ${["A","B"].map(d=>`<button style="flex:1;background:${S.workoutDay===d?'var(--green)':'var(--card2)'};color:${S.workoutDay===d?'#fff':'var(--muted)'};border:1.5px solid ${S.workoutDay===d?'var(--green)':'var(--border)'};border-radius:12px;padding:12px;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit" onclick="setDay('${d}')">Jour ${d} · ${d==='A'?'💪 Muscu':'🏃 Cardio'}</button>`).join('')}
+    </div>
+
+    <div class="card2" style="margin-bottom:12px">
+      <div class="between"><span style="font-weight:700">Progression</span><span style="color:var(--green);font-weight:900">${wp}%</span></div>
+      <div style="margin-top:8px">${progressBar(wp,'var(--green)',8)}</div>
+    </div>
+
+    ${S.timerRunning?`<div class="card" style="text-align:center;background:linear-gradient(135deg,var(--accent)20,var(--card));border:1px solid var(--accent)40"><p class="label" style="color:var(--accent)">⏱️ Repos — ${S.timerLabel}</p><div class="timer-big">${S.timerSec}s</div></div>`:''}
+
+    ${exs.map(ex=>{
+      const done=!!S.exercises[ex.id];
+      return `
+<div class="card" style="border:1px solid ${done?'var(--green)60':'var(--border)'};background:${done?'var(--green)08':'var(--card)'}">
+  <div class="between">
+    <div class="row">
+      <span style="font-size:28px">${ex.icon}</span>
+      <div>
+        <p style="margin:0;font-weight:700;font-size:16px;color:${done?'var(--green)':'var(--text)'}">${ex.label}</p>
+        <p class="muted" style="margin:0">${ex.sets} · +20 XP</p>
+      </div>
+    </div>
+    <div class="check ${done?'done':''}" onclick="toggleEx('${ex.id}',${ex.rest})">${done?ic('check'):''}</div>
+  </div>
+  ${ex.rest>0&&!done?`<button class="btn-outline" style="margin-top:10px" onclick="startTimer(${ex.rest},'${ex.label}')">⏱️ Timer ${ex.rest}s</button>`:''}
+</div>`}).join('')}
+
+    ${wp===100?`<div class="card" style="background:linear-gradient(135deg,var(--green)20,var(--card));text-align:center;border:1px solid var(--green)50"><div style="font-size:48px">🏆</div><h3 style="color:var(--green);font-size:18px;margin-top:8px">Workout terminé !</h3><p class="muted" style="margin-top:4px">+${exs.length*20} XP gagnés. Tu progresses.</p></div>`:''}
+  </div>
+</div>`;
+}
+
+function screenWater(){
+  const wp=waterPct();
+  return `
+<div class="screen">
+  <div class="header">
+    <p class="label">Hydratation</p>
+    <h1>Eau <span style="color:var(--accent)">du jour</span></h1>
+  </div>
+  <div style="padding:0 16px">
+    <div class="card" style="text-align:center;padding:32px">
+      <div style="font-size:72px;line-height:1;margin-bottom:8px">💧</div>
+      <div style="font-size:56px;font-weight:900;color:var(--accent)">${S.water}</div>
+      <div class="muted" style="font-size:16px">verres sur 8 (objectif 2L)</div>
+      <div style="margin:20px 0">
+        ${progressBar(wp,'var(--accent)',12)}
+        <div class="between" style="margin-top:6px">
+          <span class="muted">${S.water*250}ml</span>
+          <span style="color:var(--accent);font-weight:700">${wp}%</span>
+          <span class="muted">2000ml</span>
+        </div>
+      </div>
+      <button class="btn btn-full" style="font-size:18px;padding:18px;border-radius:18px" onclick="addWater()">
+        ${ic('plus',22,'#fff')} Verre d'eau (+5 XP)
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+      ${[...Array(8)].map((_,i)=>`<div style="background:${i<S.water?'var(--accent)30':'var(--card2)'};border:1.5px solid ${i<S.water?'var(--accent)':'var(--border)'};border-radius:14px;padding:16px 0;text-align:center;font-size:22px">${i<S.water?'💧':'○'}</div>`).join('')}
+    </div>
+    <div class="card">
+      <p class="label" style="margin-bottom:12px">Pourquoi s'hydrater ?</p>
+      ${["Améliore la concentration et les performances","Aide à la récupération musculaire","Meilleure peau et plus d'énergie","Objectif : 8 verres minimum / jour"].map(t=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--border)"><span style="color:var(--accent);font-weight:900;font-size:16px">›</span><span style="font-size:14px">${t}</span></div>`).join('')}
+    </div>
+  </div>
+</div>`;
+}
+
+function screenStats(){
+  const lv=getLevel(S.xp);
+  const stats=[
+    {label:"Streak",value:S.streak+"j",icon:"flame",color:"var(--amber)"},
+    {label:"XP Total",value:S.xp,icon:"zap",color:lv.color},
+    {label:"Niveau",value:lv.name,icon:"star",color:"var(--purple)"},
+    {label:"Routine",value:routinePct()+"%",icon:"list",color:"var(--green)"},
+    {label:"Sport",value:workoutPct()+"%",icon:"dumbbell",color:"var(--green)"},
+    {label:"Hydratation",value:waterPct()+"%",icon:"droplet",color:"var(--accent)"},
+  ];
+  const week=[...S.weekData];
+  week[6]=routinePct();
+  const days=["L","M","M","J","V","S","D"];
+  const badges2=[
+    {icon:"🔥",label:"Streak 7 jours",done:S.streak>=7},
+    {icon:"💧",label:"5 jours d'hydratation",done:true},
+    {icon:"💪",label:"10 séances sport",done:S.xp>=200},
+    {icon:"🏆",label:"Niveau Intermédiaire",done:S.xp>=300},
+  ];
+  return `
+<div class="screen">
+  <div class="header">
+    <p class="label">Progression</p>
+    <h1>Mes <span style="color:var(--green)">Statistiques</span></h1>
+  </div>
+  <div style="padding:0 16px">
+    <div class="grid2" style="margin-bottom:12px">
+      ${stats.map(({label,value,icon,color})=>`
+<div class="card2" style="text-align:center">
+  <div style="background:${color}20;border-radius:12px;padding:10px;width:44px;height:44px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center">${ic(icon,20,color)}</div>
+  <div style="font-size:22px;font-weight:900;color:${color}">${value}</div>
+  <div class="muted" style="font-size:11px;margin-top:2px">${label}</div>
+</div>`).join('')}
+    </div>
+
+    <div class="card">
+      <p class="label" style="margin-bottom:16px">Performance 7 derniers jours</p>
+      <div class="bar-week">
+        ${week.map((v,i)=>`
+<div class="bar-week-col">
+  <div class="bar-week-fill" style="background:${i===6?'var(--accent)':'var(--accent)50'};height:${v}%"></div>
+  <span style="font-size:11px;color:${i===6?'var(--text)':'var(--muted)'};font-weight:${i===6?700:400}">${days[i]}</span>
+</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="label" style="margin-bottom:12px">Badges</p>
+      ${badges2.map(({icon,label,done})=>`
+<div class="between" style="padding:10px 0;border-bottom:1px solid var(--border);opacity:${done?1:.4}">
+  <div class="row">
+    <span style="font-size:22px;filter:${done?'none':'grayscale(1)'}">${icon}</span>
+    <span style="font-size:14px;font-weight:${done?700:400}">${label}</span>
+  </div>
+  ${done?badge('✓','var(--green)'):''}
+</div>`).join('')}
+    </div>
+  </div>
+</div>`;
+}
+
+function screenCoach(){
+  return `
+<div class="screen" style="display:flex;flex-direction:column;height:calc(100vh - 80px);padding-bottom:0">
+  <div class="header" style="padding-bottom:12px">
+    <div class="row">
+      <div style="background:var(--accent)20;border-radius:14px;padding:10px">${ic('bot',24,'var(--accent)')}</div>
+      <div>
+        <h2>APEX Coach</h2>
+        <p class="muted" style="font-size:12px">IA personnelle · disponible 24/7</p>
+      </div>
+      <div style="margin-left:auto">${badge('● Online','var(--green)')}</div>
+    </div>
+  </div>
+
+  <div id="chatBox" style="flex:1;overflow-y:auto;padding:0 16px;display:flex;flex-direction:column;gap:10px">
+    ${S.coachMsgs.map(m=>`
+<div style="display:flex;justify-content:${m.role==='user'?'flex-end':'flex-start'}">
+  <div class="${m.role==='user'?'bubble-user':'bubble-ai'}">
+    ${m.role==='ai'?'<p style="margin:0 0 4px;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.1em">APEX</p>':''}
+    <p style="margin:0;font-size:14px;line-height:1.6;color:${m.role==='user'?'#fff':'var(--text)'}">${m.text}</p>
+  </div>
+</div>`).join('')}
+    ${S.chatLoading?`<div style="display:flex"><div class="bubble-ai"><div style="display:flex;gap:4px"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div></div>`:''}
+  </div>
+
+  <div style="padding:8px 16px;display:flex;gap:8px;overflow-x:auto">
+    ${["Comment progresser ?","Mon plan semaine","Conseils nutrition","Motivation !"].map(s=>`<button class="btn-outline" onclick="setSugg('${s}')">${s}</button>`).join('')}
+  </div>
+
+  <div class="row" style="padding:8px 16px 16px">
+    <textarea id="chatInp" class="inp" style="resize:none;height:44px;padding-top:12px" placeholder="Parle à ton coach..." onkeydown="chatKey(event)">${S.chatInput}</textarea>
+    <button class="btn" style="border-radius:14px;padding:12px 16px;flex-shrink:0" onclick="sendChat()">${ic('send',18,'#fff')}</button>
+  </div>
+</div>`;
+}
+
+function screenSettings(){
+  return `
+<div class="screen">
+  <div class="header">
+    <p class="label">Personnalisation</p>
+    <h1>Paramètres</h1>
+  </div>
+  <div style="padding:0 16px">
+    <!-- API Key -->
+    <div class="card" style="border:1px solid var(--accent)40;margin-bottom:12px">
+      <div class="row" style="margin-bottom:12px">
+        ${ic('key',20,'var(--accent)')}
+        <div><p class="label" style="color:var(--accent)">Clé API Anthropic</p><p class="muted" style="font-size:12px">Nécessaire pour le Coach IA</p></div>
+      </div>
+      <input id="apiKeyInp" class="inp" type="password" placeholder="sk-ant-..." value="${S.apiKey}" style="margin-bottom:10px"/>
+      <button class="btn btn-full" onclick="saveKey()">💾 Sauvegarder la clé</button>
+      <p class="muted" style="font-size:11px;margin-top:8px;text-align:center">Obtiens ta clé sur console.anthropic.com</p>
+    </div>
+
+    <div class="card">
+      <div style="padding:14px 0;border-bottom:1px solid var(--border)">
+        <p class="label" style="margin-bottom:8px">Heure de réveil</p>
+        <input type="time" class="inp" value="${S.settings.wakeTime}" onchange="S.settings.wakeTime=this.value"/>
+      </div>
+      <div style="padding:14px 0;border-bottom:1px solid var(--border)">
+        <p class="label" style="margin-bottom:8px">Objectif physique</p>
+        <select class="inp" onchange="S.settings.goal=this.value">
+          ${["Prise de masse","Perte de poids","Endurance","Rester en forme"].map(o=>`<option ${S.settings.goal===o?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div style="padding:14px 0;border-bottom:1px solid var(--border)">
+        <p class="label" style="margin-bottom:8px">Niveau de difficulté</p>
+        <select class="inp" onchange="S.settings.difficulty=this.value">
+          ${["Débutant","Intermédiaire","Avancé"].map(o=>`<option ${S.settings.difficulty===o?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="between" style="padding:14px 0;border-bottom:1px solid var(--border)">
+        <div><p class="label" style="margin-bottom:2px">Notifications</p><p class="muted" style="font-size:12px">Rappels quotidiens</p></div>
+        <button class="toggle ${S.settings.notifs?'on':''}" onclick="S.settings.notifs=!S.settings.notifs;render()"><div class="toggle-dot"></div></button>
+      </div>
+      <div class="between" style="padding:14px 0">
+        <div><p class="label" style="margin-bottom:2px">Mode sombre</p><p class="muted" style="font-size:12px">Interface actuelle</p></div>
+        <button class="toggle ${S.dark?'on':''}" onclick="toggleDark()"><div class="toggle-dot"></div></button>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <div style="font-size:32px;margin-bottom:8px">⚡</div>
+      <h3 style="margin-bottom:6px;font-size:18px">APEX Lookmaxing</h3>
+      <p class="muted" style="font-size:13px">Coach IA · Transformation 30 jours</p>
+      <p class="muted" style="font-size:12px;margin-top:4px">v1.0 · Propulsé par Claude AI</p>
+    </div>
+  </div>
+</div>`;
+}
+
+function navbar(){
+  const items=[
+    {id:"home",icon:"home",label:"Home"},
+    {id:"routine",icon:"list",label:"Routine"},
+    {id:"food",icon:"camera",label:"Scan"},
+    {id:"sport",icon:"dumbbell",label:"Sport"},
+    {id:"water",icon:"droplet",label:"Eau"},
+    {id:"stats",icon:"bar",label:"Stats"},
+    {id:"coach",icon:"bot",label:"Coach"},
+    {id:"settings",icon:"settings",label:"Config"},
+  ];
+  return `<nav>${items.map(({id,icon,label})=>`
+<button class="nav-btn ${S.tab===id?'active':''}" onclick="go('${id}')">
+  ${ic(icon,22,S.tab===id?'var(--accent)':'var(--muted)')}
+  <span>${label}</span>
+</button>`).join('')}</nav>`;
+}
+
+function keyModal(){
+  if(!S.showKeyModal) return '';
+  return `
+<div class="modal-bg" onclick="S.showKeyModal=false;render()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:40px">🔑</div>
+      <h2 style="margin-top:8px">Clé API requise</h2>
+      <p class="muted" style="margin-top:8px;font-size:14px;line-height:1.5">Pour utiliser le Coach IA et le Scanner alimentaire, tu as besoin d'une clé API Anthropic (gratuite pour commencer).</p>
+    </div>
+    <p class="label" style="margin-bottom:8px">Ta clé API</p>
+    <input id="modalKeyInp" class="inp" type="password" placeholder="sk-ant-..." style="margin-bottom:12px"/>
+    <button class="btn btn-full" onclick="saveModalKey()" style="margin-bottom:10px">✅ Activer le Coach IA</button>
+    <p class="muted" style="font-size:11px;text-align:center">console.anthropic.com → API Keys</p>
+  </div>
+</div>`;
+}
+
+// ══════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════
+function render(){
+  const screens={home:screenHome,routine:screenRoutine,food:screenFood,sport:screenSport,water:screenWater,stats:screenStats,coach:screenCoach,settings:screenSettings};
+  const fn=screens[S.tab]||screenHome;
+  document.getElementById('app').innerHTML = fn() + navbar() + keyModal();
+  document.body.className=S.dark?'':'light';
+  // Scroll chat to bottom
+  const cb=document.getElementById('chatBox');
+  if(cb) cb.scrollTop=cb.scrollHeight;
+  // Restore food input
+  const fi=document.getElementById('foodInp');
+  if(fi) fi.value=S.foodDesc;
+}
+
+// ══════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════
+function go(tab){ S.tab=tab; render(); window.scrollTo(0,0); }
+function toggleDark(){ S.dark=!S.dark; render(); }
+
+function toggleMorning(id){
+  S.morning[id]=!S.morning[id];
+  if(S.morning[id]) S.xp+=10;
+  render();
+}
+function toggleEvening(id){
+  S.evening[id]=!S.evening[id];
+  if(S.evening[id]) S.xp+=10;
+  render();
+}
+function toggleEx(id,rest){
+  S.exercises[id]=!S.exercises[id];
+  if(S.exercises[id]){ S.xp+=20; if(rest>0) startTimer(rest,id); }
+  render();
+}
+function setDay(d){ S.workoutDay=d; S.exercises={}; render(); }
+function addWater(){ if(S.water<12){S.water++;S.xp+=5;} render(); }
+
+function setSugg(s){
+  const el=document.getElementById('chatInp');
+  if(el){ el.value=s; el.focus(); }
+  S.chatInput=s;
+}
+function chatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
+
+async function sendChat(){
+  const el=document.getElementById('chatInp');
+  const msg=(el?el.value:S.chatInput).trim();
+  if(!msg||S.chatLoading) return;
+  S.chatInput="";
+  S.coachMsgs.push({role:"user",text:msg});
+  S.chatLoading=true;
+  render();
+  const ctx=`[Contexte: Streak ${S.streak}j | XP ${S.xp} | Eau ${S.water}/8 | Routine ${routinePct()}% | Sport ${workoutPct()}% | Niveau: ${getLevel(S.xp).name}]\n\nMessage: ${msg}`;
+  const reply=await callAI([{role:"user",content:ctx}],SYS_COACH);
+  if(reply) S.coachMsgs.push({role:"ai",text:reply});
+  S.chatLoading=false;
+  render();
+}
+
+function allowCamera(){ S.cameraAsked=true; S.cameraAllowed=true; render(); }
+function denyCamera(){ S.cameraAsked=true; S.cameraAllowed=false; render(); }
+
+function openCamera(){
+  const inp=document.getElementById('cameraInput');
+  if(inp) inp.click();
+}
+
+function handlePhoto(event){
+  const file=event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    S.photoPreview=e.target.result;
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+
+async function scanFood(){
+  const el=document.getElementById('foodInp');
+  const desc=(el?el.value.trim():S.foodDesc.trim());
+  const hasPhoto=!!S.photoPreview;
+  if(!desc&&!hasPhoto) return;
+  if(S.foodLoading) return;
+  if(desc) S.foodDesc=desc;
+  S.foodLoading=true;
+  S.foodResult=null;
+  render();
+
+  let raw='';
+  try{
+    if(!S.apiKey){ S.showKeyModal=true; S.foodLoading=false; render(); return; }
+
+    let userContent;
+    if(hasPhoto){
+      // Send image to Claude vision
+      const base64=S.photoPreview.split(',')[1];
+      const mime=S.photoPreview.split(';')[0].split(':')[1]||'image/jpeg';
+      userContent=[
+        {type:"image",source:{type:"base64",media_type:mime,data:base64}},
+        {type:"text",text:"Voici une photo de mon repas. Analyse-le."+(desc?" Description supplémentaire : "+desc:"")}
+      ];
+    } else {
+      userContent=[{type:"text",text:"Repas : "+desc}];
+    }
+
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":S.apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,system:SYS_FOOD,messages:[{role:"user",content:userContent}]})
+    });
+    const data=await res.json();
+    if(data.error){ raw=""; }
+    else { raw=data.content?.[0]?.text||""; }
+  }catch(e){ raw=""; }
+
+  if(raw){
+    try{
+      const clean=raw.replace(/```json|```/g,"").trim();
+      S.foodResult=JSON.parse(clean);
+      S.xp+=15;
+    }catch{
+      S.foodResult={verdict:"OK",score:5,explication:"Mange équilibré : protéines + légumes + féculents.",alternative:"Blanc de poulet · riz complet · brocolis"};
+    }
+  } else {
+    S.foodResult={verdict:"OK",score:5,explication:"Analyse indisponible. Mange équilibré : protéines + légumes + féculents.",alternative:"Blanc de poulet · riz complet · brocolis"};
+  }
+  S.foodLoading=false;
+  render();
+}
+
+function saveKey(){
+  const el=document.getElementById('apiKeyInp');
+  if(el&&el.value.trim()){S.apiKey=el.value.trim();localStorage.setItem("apex_key",S.apiKey);alert("✅ Clé sauvegardée !");}
+}
+function saveModalKey(){
+  const el=document.getElementById('modalKeyInp');
+  if(el&&el.value.trim()){S.apiKey=el.value.trim();localStorage.setItem("apex_key",S.apiKey);S.showKeyModal=false;render();}
+}
+
+// Initial render
+render();
+</script>
+</body>
+</html>
